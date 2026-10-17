@@ -23,6 +23,13 @@ def run_live_update(cfg: Config) -> None:
     master_path = DATA_PROCESSED / "master_full.csv"
     rdi_path = DATA_PROCESSED / "rdi_output.csv"
 
+    # If the CSV doesn't exist (e.g., fresh clone from GitHub), build it first
+    if not master_path.exists():
+        log.warning("Master data missing. Running Phase 1 to build history...")
+        from mrd.phase1_pipeline.build_master import run_phase1
+
+        run_phase1(cfg)
+
     master = load_csv(master_path)
     last_date = master.index.max()
     today = pd.Timestamp.today().normalize()
