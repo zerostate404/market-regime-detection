@@ -24,11 +24,20 @@ def run_live_update(cfg: Config) -> None:
     rdi_path = DATA_PROCESSED / "rdi_output.csv"
 
     # If the CSV doesn't exist (e.g., fresh clone from GitHub), build it first
-    if not master_path.exists():
-        log.warning("Master data missing. Running Phase 1 to build history...")
+    # If the processed data doesn't exist (e.g., fresh clone from GitHub), build it first
+    if not rdi_path.exists():
+        log.warning(
+            "Processed data missing. Running full historical pipeline (Phases 1-4)..."
+        )
         from mrd.phase1_pipeline.build_master import run_phase1
+        from mrd.phase2_features import run_all_features
+        from mrd.phase3_fusion import run_fusion
+        from mrd.phase4_backtest import run_phase4
 
         run_phase1(cfg)
+        run_all_features()
+        run_fusion(cfg)
+        run_phase4(cfg)
 
     master = load_csv(master_path)
     last_date = master.index.max()
