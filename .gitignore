@@ -1,0 +1,25 @@
+# Data (Do not push large CSVs)
+data/raw/*.csv
+data/cache/*.csv
+data/features/*.csv
+data/processed/*.csv
+data/interim/
+data/external/
+
+# Models (Frozen stats are okay, but not large pickles if we had them)
+models/*.pkl
+models/*.joblib
+
+# Environments
+.venv/
+env/
+__pycache__/
+*.pyc
+*.egg-info/
+.pytest_cache/
+
+# Streamlit
+.streamlit/secrets.toml
+
+# OS
+.DS_Store

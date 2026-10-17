@@ -1,0 +1,62 @@
+project:
+  name: market-regime-detection
+  version: 0.1.0
+
+data:
+  tickers:
+    sp500: "^GSPC"
+    vix: "^VIX"
+  start_date: "2000-01-01"
+  end_date: "2025-01-01"      # exclusive — includes 2024-12-31
+  split_date: "2022-01-01"    # train < split <= test
+
+paths:
+  raw:       data/raw
+  interim:   data/interim
+  processed: data/processed
+  features:  data/features
+  external:  data/external
+  cache:     data/cache
+  reports:   reports
+  models:    models
+
+logging:
+  level: INFO
+
+regime_events:
+  Dot-com Crash Start:   "2000-03-10"
+  Dot-com Bottom:        "2002-10-09"
+  GFC Peak:              "2007-10-09"
+  GFC Bottom:            "2009-03-09"
+  COVID Crash:           "2020-02-19"
+  COVID Recovery:        "2020-04-07"
+  Rate Hike Cycle Start: "2022-01-03"
+  2022 Bear Bottom:      "2022-10-12"
+
+fusion:
+  drift_threshold: 1.5
+  weights:
+    GARCH_Persistence: 0.30
+    Kurtosis:          0.25
+    Shannon_Entropy:   0.20
+    Skewness:          0.15
+    Hurst:             0.10
+
+backtest:
+  drawdown_threshold: -0.15     # >15% below running peak = crisis
+  min_episode_days: 10          # drop episodes shorter than this
+  merge_gap_days: 10            # merge episodes separated by a shorter gap
+  rdi_warning_percentile: 85    # warning threshold from TRAIN RDI distribution
+  max_lookback_days: 90         # max days before crisis a warning can count
+
+live:
+  # Fallback chain: if the first fails, try the second, then the third
+  source_priority:
+    sp500:
+      - yfinance: "^GSPC"
+      - stooq: "^spx"
+      - fred: "SP500"
+    vix:
+      - yfinance: "^VIX"
+      - stooq: "^vix"
+      - fred: "VIXCLS"
