@@ -4,6 +4,16 @@ Run with:
     streamlit run src/mrd/phase6_dashboard/app.py
 """
 
+import sys
+from pathlib import Path
+
+# Add the 'src' directory to the Python path so Streamlit Cloud can find the 'mrd' package
+src_path = str(Path(__file__).resolve().parents[2])
+if src_path not in sys.path:
+    sys.path.append(src_path)
+
+# ... (the rest of your imports continue here: import json, import streamlit as st, etc.)
+
 import json
 from mrd.paths import REPORTS_DIR
 import streamlit as st
