@@ -23,8 +23,6 @@ def run_live_update(cfg: Config) -> None:
     master_path = DATA_PROCESSED / "master_full.csv"
     rdi_path = DATA_PROCESSED / "rdi_output.csv"
 
-    # If the CSV doesn't exist (e.g., fresh clone from GitHub), build it first
-    # If the processed data doesn't exist (e.g., fresh clone from GitHub), build it first
     if not rdi_path.exists():
         log.warning(
             "Processed data missing. Running full historical pipeline (Phases 1-4)..."
