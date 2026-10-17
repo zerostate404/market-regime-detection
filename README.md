@@ -36,7 +36,7 @@ Phase 6: Dashboard — Interactive Streamlit & Plotly UI for real-time monitorin
 Clone the repository and install the package in editable mode:
 
 bash
-git clone https://github.com/yourusername/market-regime-detection.git
+git clone https://github.com/zerostate404/market-regime-detection.git
 cd market-regime-detection
 pip install -e .
 pip install -r requirements.txt
