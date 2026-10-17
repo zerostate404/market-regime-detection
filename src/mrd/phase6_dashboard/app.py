@@ -4,6 +4,8 @@ Run with:
     streamlit run src/mrd/phase6_dashboard/app.py
 """
 
+import json
+from mrd.paths import REPORTS_DIR
 import streamlit as st
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
@@ -21,6 +23,14 @@ def get_data():
 
 df = get_data()
 
+# ── LOAD THRESHOLD (Moved up so it's available everywhere) ──────────────
+try:
+    with open(REPORTS_DIR / "tables" / "backtest_summary.json", "r") as f:
+        bt_data = json.load(f)
+    warning_thresh = bt_data["warning_threshold"]
+except FileNotFoundError:
+    warning_thresh = 0.3857  # Fallback if file doesn't exist yet
+
 # ── HEADER ──────────────────────────────────────────────────────────────
 st.title("Market Regime Drift Detector")
 st.markdown(
@@ -29,15 +39,17 @@ st.markdown(
 
 # Latest values
 latest = df.iloc[-1]
-latest_date_str = df.index[-1].strftime("%Y-%m-%d")  # Convert to string for metric
+latest_date_str = df.index[-1].strftime("%Y-%m-%d")
 latest_rdi = latest["RDI"]
 latest_close = latest["SP500_Close"]
 
 col1, col2, col3 = st.columns(3)
-col1.metric("Last Updated", latest_date_str)  # Fixed: passing string now
+col1.metric("Last Updated", latest_date_str)
 col2.metric("S&P 500 Close", f"${latest_close:,.2f}")
 col3.metric(
-    "Current RDI", f"{latest_rdi:.4f}", help="Values > 0.385 indicate warning zone"
+    "Current RDI",
+    f"{latest_rdi:.4f}",
+    help=f"Values > {warning_thresh:.4f} indicate warning zone",
 )
 
 st.divider()
@@ -82,8 +94,7 @@ fig.add_trace(
     secondary_y=True,
 )
 
-# Warning threshold line (85th percentile of train RDI)
-warning_thresh = 0.3857  # From Phase 4 output
+# Warning threshold line
 fig.add_hline(
     y=warning_thresh,
     line_dash="dash",
@@ -138,7 +149,7 @@ fig_bar.update_layout(
     xaxis_title="Z-Score (σ from train mean)",
     yaxis_title="",
     margin=dict(l=0, r=0, t=20, b=0),
-    xaxis=dict(range=[-4, 4]),  # Standardize range so bars are comparable
+    xaxis=dict(range=[-4, 4]),
 )
 fig_bar.add_vline(
     x=1.5, line_dash="dash", line_color="black", annotation_text="Warning"
